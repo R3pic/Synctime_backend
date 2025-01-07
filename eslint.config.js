@@ -14,14 +14,12 @@ module.exports = [
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
   eslintConfigPrettier,
-
   {
     languageOptions: {
       globals: {
         ...globals.node,
         ...globals.jest,
       },
-
       parser: tseslint.parser,
       parserOptions: {
         projectService: true,
@@ -36,5 +34,15 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+  {
+    overrides: [
+      {
+        files: ['**/*.test.ts', '**/*.spec.ts'],
+        rules: {
+          '@typescript-eslint/unbound-method': 'off',
+        },
+      },
+    ],
+  }
 ];
 
