@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MeetingController } from './meeting.controller';
 import { MeetingService } from './meeting.service';
-import type { MeetingCreateDto } from './meeting.dto';
+import type { MeetingCreateRequestBody } from './meeting.dto';
 import { HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -30,11 +30,15 @@ describe('MeetingController', () => {
   describe('createMeeting', () => {
     const expectedID = 'ABCDEFG';
     it('올바른 형식으로 호출되었을 경우', async () => {
-      const mockData: MeetingCreateDto = {
+      const mockData: MeetingCreateRequestBody = {
         title: '테스트데이터',
         dates: ['2024-12-30', '2024-12-29'],
         starttime: '09:00',
         endtime: '12:00',
+        schedule: {
+          name: "주최자",
+          data: []
+        }
       };
       const mockResponse = {
         setHeader: jest.fn(),

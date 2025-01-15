@@ -3,7 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { MeetingModule } from '../src/meeting/meeting.module';
 import { MeetingService } from '../src/meeting/meeting.service';
-import { MeetingCreateDto } from 'src/meeting/meeting.dto';
+import { MeetingCreateRequestBody } from 'src/meeting/meeting.dto';
 
 describe('MeetingController (e2e)', () => {
   let app: INestApplication;
@@ -27,11 +27,15 @@ describe('MeetingController (e2e)', () => {
 
   describe('/meeting (POST) 모임 생성', () => {
     it('올바른 MeetingCreateDto로 요청시 201와 Location 헤더를 반환한다.', () => {
-      const data: MeetingCreateDto = {
+      const data: MeetingCreateRequestBody = {
         title: '테스트 값',
         dates: ['2024-12-29', '2024-12-30'],
         starttime: '09:00',
-        endtime: '12:00'
+        endtime: '12:00',
+        schedule: {
+          name: "주최자",
+          data: []
+        }
       }
   
       return request(app.getHttpServer())
@@ -46,7 +50,7 @@ describe('MeetingController (e2e)', () => {
     });
 
     it('time Format이 올바르지 않을 시 400 BadRequest를 반환한다.', () => {
-      const data: Partial<MeetingCreateDto> = {
+      const data: Partial<MeetingCreateRequestBody> = {
         title: '테스트 값',
         dates: ['2024-12-29', '2024-12-30'],
         starttime: '09:0d',
@@ -66,7 +70,7 @@ describe('MeetingController (e2e)', () => {
     })
 
     it('dates 내부 형식이 YYYY-MM-DD 형식이 아닐 경우 400 BadRequest를 반환한다.', () => {
-      const data: Partial<MeetingCreateDto> = {
+      const data: Partial<MeetingCreateRequestBody> = {
         title: '테스트 값',
         dates: ['2024-12-1', '2024-12-30'],
         starttime: '09:00',
@@ -85,6 +89,4 @@ describe('MeetingController (e2e)', () => {
       })
     })
   })
-
-  
 });
