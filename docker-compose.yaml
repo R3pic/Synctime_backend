@@ -1,0 +1,18 @@
+services:
+  backend:
+    container_name: st_backend
+    image: node:22.13-alpine
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: >
+      sh -c "npm install -g pnpm &&
+             pnpm config set store-dir /root/.pnpm-store &&
+             pnpm i &&
+             pnpm prisma migrate dev &&
+             pnpm prisma generate &&
+             pnpm run start:dev
+            "
