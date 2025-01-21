@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { MeetingAddRequestBody, MeetingCreateRequestBody, MeetingGetDto, Schedule } from './meeting.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { IDGen } from '../lib/idGen';
@@ -68,7 +68,12 @@ export class MeetingService {
     async addSchedule(id: string, body: MeetingAddRequestBody) {
         const info = await this.prisma.meeting.findUnique({
             select: {
-                dates: true
+                dates: true,
+                schedules: {
+                    select: {
+                        name: true
+                    }
+                },
             },
             where: {
                 id
@@ -79,6 +84,11 @@ export class MeetingService {
             throw new NotFoundException(`Meeting ID ${id} Not Found`);
 
         const dates = JSON.parse(info.dates) as string[];
+
+        info.schedules.forEach((schedule) => {
+            if (schedule.name === body.name)
+                throw new ConflictException(`ConflictException. Name should be unique in Meeting Info`)
+        });
 
         body.data.forEach((data) => {
             if (!dates.includes(data.date))

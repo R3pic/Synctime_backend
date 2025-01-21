@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import type { MeetingAddRequestBody, MeetingCreateRequestBody } from './meeting.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { IDGen } from '../lib/idGen';
-import { UnprocessableEntityException } from '@nestjs/common';
+import { ConflictException, UnprocessableEntityException } from '@nestjs/common';
 
 describe('MeetingService', () => {
   let service: MeetingService;
@@ -51,7 +51,10 @@ describe('MeetingService', () => {
   describe('/meeting/:id (POST)', () => {
     it('정상 요청시 Schedule 데이터를 추가한다.', async () => {
       const mockInfo = {
-        dates: JSON.stringify(['2024-11-24', '2024-11-25'])
+        dates: JSON.stringify(['2024-11-24', '2024-11-25']),
+        schedules: [
+          { name: '주최자' }
+        ]
       };
 
       const mockRequestBody: MeetingAddRequestBody = {
@@ -74,7 +77,10 @@ describe('MeetingService', () => {
 
     it('info에 없는 날짜에 추가할 경우 UnprocessableEntityException을 발생시킨다.', async () => {
       const mockInfo = {
-        dates: JSON.stringify(['2024-11-24', '2024-11-25'])
+        dates: JSON.stringify(['2024-11-24', '2024-11-25']),
+        schedules: [
+          { name: '주최자' }
+        ]
       };
 
       const mockRequestBody: MeetingAddRequestBody = {
@@ -92,5 +98,29 @@ describe('MeetingService', () => {
       await expect(service.addSchedule('ID', mockRequestBody)).rejects.toThrow(UnprocessableEntityException);
       expect(mockPrisma.meeting.findUnique).toHaveBeenCalled();
     })
+
+    it('info에 동일한 별명을 사용할 경우 ConflictException을 발생시킨다.', async () => {
+      const mockInfo = {
+        dates: JSON.stringify(['2024-11-24', '2024-11-25']),
+        schedules: [
+          { name: '주최자' }
+        ]
+      };
+
+      const mockRequestBody: MeetingAddRequestBody = {
+        name: '주최자',
+        data: [
+          {
+            date: '2024-11-24',
+            time: '1'.repeat(48)
+          }
+        ]
+      }
+
+      mockPrisma.meeting.findUnique.mockResolvedValue(mockInfo as any);
+
+      await expect(service.addSchedule('ID', mockRequestBody)).rejects.toThrow(ConflictException);
+      expect(mockPrisma.meeting.findUnique).toHaveBeenCalled();
+    });
   });
 });
