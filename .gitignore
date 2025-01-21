@@ -1,4 +1,5 @@
 /prisma/dev.db
+package-lock.json
 
 # compiled output
 /dist
