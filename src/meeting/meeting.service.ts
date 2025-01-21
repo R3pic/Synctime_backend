@@ -83,27 +83,31 @@ export class MeetingService {
         if (info == null)
             throw new NotFoundException(`Meeting ID ${id} Not Found`);
 
-        const dates = JSON.parse(info.dates) as string[];
-
         info.schedules.forEach((schedule) => {
             if (schedule.name === body.name)
                 throw new ConflictException(`ConflictException. Name should be unique in Meeting Info`)
         });
 
         body.data.forEach((data) => {
-            if (!dates.includes(data.date))
+            if (!parseDates(info.dates).includes(data.date))
                 throw new UnprocessableEntityException(`Unexpected Date. Date should be defined on Meeting`)
         })
 
-        const data = await this.prisma.schedule.create({
+        await this.prisma.schedule.create({
             data: {
                 meeting_id: id,
                 name: body.name,
                 data: JSON.stringify(body.data)
             }
-        })
-
-        return data;
+        });
     }
+}
 
+function parseDates(dates: string) {
+    const result = JSON.parse(dates);
+
+    if (result && Array.isArray(result))
+        return result;
+
+    throw new Error("meeting dates JSON Parse Error");
 }
