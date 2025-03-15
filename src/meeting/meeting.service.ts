@@ -5,7 +5,7 @@ import { IDGen } from '../lib/idGen';
 
 
 @Injectable()
-export class MeetingService { 
+export class MeetingService {
     constructor(private prisma: PrismaService) {}
     async createMeeting({ title, starttime, endtime, dates, schedule }: MeetingCreateRequestBody): Promise<string> {
         const id = IDGen.id();

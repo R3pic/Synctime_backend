@@ -15,9 +15,9 @@ describe('MeetingService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [MeetingService, PrismaService],
     })
-    .overrideProvider(PrismaService)
-    .useValue(mockDeep<PrismaClient>())
-    .compile();
+      .overrideProvider(PrismaService)
+      .useValue(mockDeep<PrismaClient>())
+      .compile();
 
     service = module.get<MeetingService>(MeetingService);
     mockPrisma = module.get(PrismaService);
@@ -42,7 +42,7 @@ describe('MeetingService', () => {
         }
       }
       const actual = await service.createMeeting(mockdata);
-  
+
       expect(mockPrisma.meeting.create).toHaveBeenCalledTimes(1);
       expect(actual).toEqual(expectedID);
     })
@@ -68,7 +68,7 @@ describe('MeetingService', () => {
       }
 
       mockPrisma.meeting.findUnique.mockResolvedValue(mockInfo as any);
-      
+
       await service.addSchedule('ID', mockRequestBody);
 
       expect(mockPrisma.meeting.findUnique).toHaveBeenCalled();
